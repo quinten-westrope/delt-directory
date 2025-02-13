@@ -1,5 +1,5 @@
 import React from 'react'; // import React library
-import Directory from './components/directory'; // import Directory component
+import Directory from '../public/directory'; // import Directory component
 
 function App() {
   return (
