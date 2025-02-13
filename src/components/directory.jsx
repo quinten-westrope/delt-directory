@@ -142,7 +142,7 @@ const Directory = () => {
       {/* Image */}
       <div style={{ marginTop: '-22px', width: '100%', display: 'flex', justifyContent: 'center' }}>
         <img 
-          src={`${process.env.PUBLIC_URL}/delt_background.png`}
+          src={`${process.env.PUBLIC_URL}/delt.png`}
           alt="Delt Background" 
           style={{ maxWidth: '50%', height: 'auto', objectFit: 'contain' }} 
         />
@@ -164,7 +164,8 @@ const Directory = () => {
               style={{ 
                 cursor: 'pointer', 
                 transition: 'color 0.2s', 
-                color: 'black' 
+                color: 'black', 
+                marginBottom: '20px',
               }}
               onClick={() => handleMemberClick(member)}
               onMouseEnter={(e) => (e.target.style.color = '#4682B4')} // Light blue text on hover
@@ -190,7 +191,7 @@ const Directory = () => {
             padding: '20px',
             borderRadius: '8px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            maxWidth: '400px',
+            maxWidth: '300px',
             width: '100%',
           }}
         >
