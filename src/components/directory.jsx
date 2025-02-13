@@ -142,7 +142,7 @@ const Directory = () => {
       {/* Image */}
       <div style={{ marginTop: '-22px', width: '100%', display: 'flex', justifyContent: 'center' }}>
         <img 
-          src="/delt_background.png" 
+          src="./delt_background.png" 
           alt="Delt Background" 
           style={{ maxWidth: '50%', height: 'auto', objectFit: 'contain' }} 
         />
