@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { TextField, Typography, List, ListItem, Modal, Box } from '@mui/material';
+import { TextField, Typography, List, ListItem, Modal, Box, Button, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Directory = () => {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [membersList, setMembersList] = useState(''); // 'active' or 'alumni'
 
   // List of fraternity members by year
-  const members = [
+  const activeMembers = [
     
     // Freshmen
     { name: 'Casen Lentz', major: 'Political Science', email: 'casendrake@icloud.com', phone: '602-739-9726', graduation_year: 'May 2028' },
@@ -110,44 +113,163 @@ const Directory = () => {
     { name: 'Isaiah Walker', major: 'Accounting', email: 'isaiah022803walker@gmail.com', phone: '913-220-9907', graduation_year: 'May 2025' },
   ];
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearch(query);
 
-    if (query === '') {
-      setResults([]); // Clear results if search box is empty
-    } else {
-      // Filter the members based on the search term
-      const filteredResults = members.filter((member) =>
-        member.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filteredResults);
-    }
-  };
 
-  const handleMemberClick = (member) => {
-    setSelectedMember(member);
-    setOpenModal(true);
-  };
+  // List of fraternity alumni members (2020 - 2018 for now)
+  const alumniMembers = [
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedMember(null);
-  };
+    { name: "Benjamin W. White", pledge_class: "2021", phone: "(314) 917-2689", email: "Benwhite861@gmail.com" },
+    { name: "Giovanni O. Zamora", pledge_class: "2021", phone: "", email: "Zamora.gio1122@gmail.com" },
+    { name: "Jacob T. Angers", pledge_class: "2020", phone: "(314) 954-8334", email: "jacob.angers@gmail.com" },
+    { name: "Joseph M. Connor", pledge_class: "2020", phone: "(785) 220-8498", email: "joeyconnor02@gmail.com" },
+    { name: "Jackson A. Daesch", pledge_class: "2020", phone: "", email: "jacksonred55@gmail.com" },
+    { name: "Daniel J. Duffy", pledge_class: "2020", phone: "", email: "duffydanny247@gmail.com" },
+    { name: "John R. Emerson", pledge_class: "2020", phone: "(913) 208-5501", email: "jackemerson7524@gmail.com" },
+    { name: "Ryan P. Hinrichs", pledge_class: "2020", phone: "(913) 747-5199", email: "rhinrichs01@gmail.com" },
+    { name: "Sean J. Hogan", pledge_class: "2020", phone: "", email: "Hogie1234567@gmail.com" },
+    { name: "Jackson A. Holton", pledge_class: "2020", phone: "(913) 210-9661", email: "blondieholton@gmail.com" },
+    { name: "Andrew M. Kolpin", pledge_class: "2020", phone: "(913) 940-3964", email: "dkolpin39@gmail.com" },
+    { name: "Matthew L. LaTendresse", pledge_class: "2020", phone: "", email: "matthewlatendresse0803@gmail.com" },
+    { name: "John C. Lindsay", pledge_class: "2020", phone: "", email: "johnclindsay18@gmail.com" },
+    { name: "Dylan J. Naylor", pledge_class: "2020", phone: "(913) 747-5920", email: "dylan.naylorr@gmail.com" },
+    { name: "Alexander G. Norman", pledge_class: "2020", phone: "", email: "a708n367@ku.edu" },
+    { name: "McCabe R. Quast", pledge_class: "2020", phone: "(630) 528-8541", email: "macquast@gmail.com" },
+    { name: "Jackson D. Redfield", pledge_class: "2020", phone: "(913) 991-8175", email: "jacksonredfield0625@gmail.com" },
+    { name: "Ethan J. Sanders", pledge_class: "2020", phone: "(913) 309-8767", email: "ej15sanders@gmail.com" },
+    { name: "Samuel J. Sliefert", pledge_class: "2020", phone: "", email: "samjsliefert@gmail.com" },
+    { name: "Charles J. Watson", pledge_class: "2020", phone: "", email: "watsoncj46@yahoo.com" },
+    { name: "Caleb J. Wirth", pledge_class: "2020", phone: "(314) 221-9160", email: "cwirth715@gmail.com" },
+    { name: "Charles E. Wolff", pledge_class: "2020", phone: "(913) 488-6719", email: "Charliewolff29@gmail.com" },
+    { name: "Dylan L. Aitkens", pledge_class: "2019", phone: "", email: "dylanaitkens01@gmail.com" },
+    { name: "John R. Allen", pledge_class: "2019", phone: "", email: "j772a472@ku.edu" },
+    { name: "Brett E. Chapple", pledge_class: "2019", phone: "", email: "b522c980@ku.edu" },
+    { name: "Mitchell D. Clark", pledge_class: "2019", phone: "", email: "mclarkicloud@icloud.com" },
+    { name: "Joseph P. Creighton", pledge_class: "2019", phone: "", email: "joecr8on99@gmail.com" },
+    { name: "Trevor J. Ellefson", pledge_class: "2019", phone: "", email: "tellefson@ku.edu" },
+    { name: "Ryan G. Holton", pledge_class: "2019", phone: "", email: "r185h262@ku.edu" },
+    { name: "Maxwell R. Hughes", pledge_class: "2019", phone: "", email: "m797h743@ku.edu" },
+    { name: "Dylan W. Jamison", pledge_class: "2019", phone: "", email: "dylanjamison@ku.edu" },
+    { name: "Tristan S. Kenagy", pledge_class: "2019", phone: "", email: "tkenagy7@ku.edu" },
+    { name: "Joseph E. Maksoud", pledge_class: "2019", phone: "", email: "j129m352@ku.edu" },
+    { name: "Nathan F. Moorse", pledge_class: "2019", phone: "", email: "namoorse@gmail.com" },
+    { name: "Adam P. Morse", pledge_class: "2019", phone: "", email: "apmorse@outlook.com" },
+    { name: "Evan M. Mullen", pledge_class: "2019", phone: "", email: "evanmullen@ku.edu" },
+    { name: "Nathan S. Munsch", pledge_class: "2019", phone: "", email: "natemunsch03@gmail.com" },
+    { name: "Wiliam K. Oppenheim", pledge_class: "2019", phone: "", email: "willoppenheim@yahoo.com" },
+    { name: "Koby E. Ryckman", pledge_class: "2019", phone: "", email: "k903r285@ku.edu" },
+    { name: "Bradley M. Sides", pledge_class: "2019", phone: "", email: "sidesbradley19@gmail.com" },
+    { name: "Ryan E. Stacey", pledge_class: "2019", phone: "", email: "r503s596@ku.edu" },
+    { name: "Gavin L. Wolfmule", pledge_class: "2019", phone: "", email: "gwolfmule@yahoo.com" },
+    { name: "Jesse D. Atencio", pledge_class: "2018", phone: "", email: "jesse.atencio@gmail.com" },
+    { name: "Ryan M. Beaupre", pledge_class: "2018", phone: "", email: "ryanbeaupre06@gmail.com" },
+    { name: "Nicholas M. Camugnaro", pledge_class: "2018", phone: "", email: "ncamugnaro@yahoo.com" },
+    { name: "Daniel R. Carlson", pledge_class: "2018", phone: "", email: "dcarlson2017@gmail.com" },
+    { name: "Cooper K. Cate", pledge_class: "2018", phone: "", email: "coopercate2@gmail.com" },
+    { name: "Spencer L. Daesch", pledge_class: "2018", phone: "", email: "spencerdaesch@gmail.com" },
+    { name: "Bradley S. Davis", pledge_class: "2018", phone: "", email: "bdavis2456@gmail.com" },
+    { name: "Gerren H. Graham", pledge_class: "2018", phone: "", email: "gerren.graham@yahoo.com" },
+    { name: "Eric R. Hartman", pledge_class: "2018", phone: "", email: "ehartman@ku.edu" },
+    { name: "Jared T. Hicks", pledge_class: "2018", phone: "", email: "jhicks15@icloud.com" },
+    { name: "Michael B. Hixson", pledge_class: "2018", phone: "", email: "hixsonblake@yahoo.com" },
+    { name: "Chase W. Hofer", pledge_class: "2018", phone: "", email: "chasehofer88@gmail.com" },
+    { name: "Harrison K. Hughes", pledge_class: "2018", phone: "", email: "hkhughes17@gmail.com" },
+    { name: "Harrison A. Jones", pledge_class: "2018", phone: "", email: "harrison.a.jones1@gmail.com" },
+    { name: "Cameron J. Kozol", pledge_class: "2018", phone: "", email: "cameronkozol2@cox.net" },
+    { name: "Zachary E. Kurland", pledge_class: "2018", phone: "", email: "zkurland00@gmail.com" },
+    { name: "Joesph R. Lavin", pledge_class: "2018", phone: "", email: "josephrlavin@gmail.com" },
+    { name: "Nathaniel H. Lueke", pledge_class: "2018", phone: "", email: "nhlueke@gmail.com" },
+    { name: "Connor M. McCartney", pledge_class: "2018", phone: "", email: "con34mac@gmail.com" },
+    { name: "Ian J. McHugh", pledge_class: "2018", phone: "", email: "ian.mchugh37@gmail.com" },
+    { name: "Peter G. McMonigle", pledge_class: "2018", phone: "", email: "pmcmonigle15@gmail.com" },
+    { name: "Mitchell L. Midyett", pledge_class: "2018", phone: "", email: "mitch.midyett@gmail.com" },
+    { name: "James R. Morton", pledge_class: "2018", phone: "", email: "jr.morton42@gmail.com" },
+    { name: "Peter N. Nickel", pledge_class: "2018", phone: "", email: "pete5nickel@gmail.com" },
+    { name: "Garrett C. Parks", pledge_class: "2018", phone: "", email: "garrett.parks52@gmail.com" },
+    { name: "Jacob D. Peterson", pledge_class: "2018", phone: "", email: "jdpeterson924@gmail.com" },
+    { name: "Cannon M. Phillips", pledge_class: "2018", phone: "", email: "CannonMPLP@ku.edu" },
+    { name: "Brooks D. Rockey", pledge_class: "2018", phone: "", email: "brooksrockey@gmail.com" },
+    { name: "Ryan R. Scott", pledge_class: "2018", phone: "", email: "rscotty1551@gmail.com" },
+    { name: "Amir N. Shami", pledge_class: "2018", phone: "", email: "amirnader.shami@gmail.com" },
+    { name: "Rudhra D. Thakur", pledge_class: "2018", phone: "", email: "Rudhra26@gmail.com" },
+    { name: "Miguel A. Valrie", pledge_class: "2018", phone: "", email: "miguelxvalrie@gmail.com" },
+    { name: "Noah T. Watkins", pledge_class: "2018", phone: "", email: "noah.watkins3@gmail.com" },
+    { name: "Brock E. Weinfurter", pledge_class: "2018", phone: "", email: "Beweinfurter@gmail.com" },
+    { name: "Burke D. Wheeler", pledge_class: "2018", phone: "", email: "burkewheeler7@gmail.com" },
+    { name: "Michael A. Wood", pledge_class: "2018", phone: "", email: "mawood633@gmail.com" },
+    { name: "Callum E. Yockey", pledge_class: "2018", phone: "", email: "c.yockey4@gmail.com" }
+];
 
-  return (
-    <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Typography variant="h5">Delt Directory</Typography>
 
-      {/* Image */}
-      <div style={{ marginTop: '-22px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <img 
-          src={`${process.env.PUBLIC_URL}/delt.png`}
-          alt="Delt Background" 
-          style={{ maxWidth: '50%', height: 'auto', objectFit: 'contain' }} 
-        />
+
+const handleSearch = (e) => {
+  const query = e.target.value;
+  setSearch(query);
+
+  if (query === '') {
+    setResults([]);
+  } else {
+    const filteredResults = (membersList === 'active' ? activeMembers : alumniMembers).filter((member) =>
+      member.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setResults(filteredResults);
+  }
+};
+
+const handleMemberClick = (member) => {
+  setSelectedMember(member);
+  setOpenModal(true);
+};
+
+const handleCloseModal = () => {
+  setOpenModal(false);
+  setSelectedMember(null);
+};
+
+const handleBackClick = () => {
+  setShowSearch(false);
+  setSearch('');
+  setResults([]);
+};
+
+return (
+  <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Typography variant="h5">Delt Directory</Typography>
+    <div style={{ marginTop: '-22px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <img 
+        src={`${process.env.PUBLIC_URL}/delt.png`}
+        alt="Delt Background" 
+        style={{ maxWidth: '50%', height: 'auto', objectFit: 'contain' }} 
+      />
+    </div>
+
+    {showSearch && (
+      <IconButton onClick={handleBackClick} style={{ position: 'absolute', top: '10px', left: '10px', color: 'black' }}>
+        <ArrowBackIcon />
+      </IconButton>
+    )}
+
+    {!showSearch && (
+      <div style={{ display: 'flex', gap: '12px', marginTop: '-10px' }}>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => { setShowSearch(true); setMembersList('active'); }}
+          style={{ backgroundColor: '#3f51b5', color: '#fff' }}
+        >
+          Active Members
+        </Button>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => { setShowSearch(true); setMembersList('alumni'); }}
+          style={{ backgroundColor: '#3f51b5', color: '#fff' }}
+        >
+          Alumni
+        </Button>
       </div>
+    )}
 
+    {showSearch && (
       <TextField
         label="Search by name"
         value={search}
@@ -156,60 +278,67 @@ const Directory = () => {
         margin="normal"
         style={{ width: '300px', marginTop: '-22px' }}
       />
-      <List>
-        {results.length > 0 ? (
-          results.map((member, index) => (
-            <ListItem
-              key={index}
-              style={{ 
-                cursor: 'pointer', 
-                transition: 'color 0.2s', 
-                color: 'black', 
-                marginBottom: '20px',
-              }}
-              onClick={() => handleMemberClick(member)}
-              onMouseEnter={(e) => (e.target.style.color = '#4682B4')} // Light blue text on hover
-              onMouseLeave={(e) => (e.target.style.color = 'black')} // Revert to black when not hovering
-            >
-              {member.name} {/* Display only name here */}
-            </ListItem>
-          ))
-        ) : (
-          search && <Typography>No results found</Typography> // Only show "No results" if there's text in the search
+    )}
+
+    <List>
+      {results.length > 0 ? (
+        results.map((member, index) => (
+          <ListItem
+            key={index}
+            style={{ cursor: 'pointer', transition: 'color 0.2s', color: 'black', marginBottom: '20px' }}
+            onClick={() => handleMemberClick(member)}
+            onMouseEnter={(e) => (e.target.style.color = '#4682B4')}
+            onMouseLeave={(e) => (e.target.style.color = 'black')}
+          >
+            {member.name}
+          </ListItem>
+        ))
+      ) : (
+        search && <Typography>No results found</Typography>
+      )}
+    </List>
+
+    <Modal open={openModal} onClose={handleCloseModal}>
+      <Box
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+          maxWidth: '300px',
+          width: '100%',
+        }}
+      >
+        {selectedMember && (
+          <div>
+            <Typography variant="h6">{selectedMember.name}</Typography>
+            {membersList === 'active' ? (
+              <>
+                <Typography>Graduation Year: {selectedMember.graduation_year}</Typography>
+                <Typography>Major: {selectedMember.major}</Typography>
+                <Typography>Phone: {selectedMember.phone}</Typography>
+                <Typography>Email: {selectedMember.email}</Typography>
+              </>
+            ) : (
+              <>
+                <Typography>Pledge Class: {selectedMember.pledge_class}</Typography>
+                <Typography>Phone: {selectedMember.phone}</Typography>
+                <Typography>Email: {selectedMember.email}</Typography>
+              </>
+            )}
+          </div>
         )}
-      </List>
+      </Box>
+    </Modal>
+   
+    <div style={{ marginBottom: '75px' }}></div>
 
-      {/* Modal for displaying member details */}
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            maxWidth: '300px',
-            width: '100%',
-          }}
-        >
-          {selectedMember && (
-            <div>
-              <Typography variant="h6">{selectedMember.name}</Typography>
-              <Typography>Graduation Year: {selectedMember.graduation_year}</Typography>
-              <Typography>Major: {selectedMember.major}</Typography>
-              <Typography>Phone: {selectedMember.phone}</Typography>
-              <Typography>Email: {selectedMember.email}</Typography>
-            </div>
-          )}
-        </Box>
-      </Modal>
-
-      <div style={{height: '70px'}}></div>
-
-    </div>
+  </div>
+    
   );
 };
 
