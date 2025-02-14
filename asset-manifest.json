@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/delt-directory/static/css/main.e6c13ad2.css",
-    "main.js": "/delt-directory/static/js/main.9c33ce06.js",
+    "main.js": "/delt-directory/static/js/main.773a0970.js",
     "static/js/488.a8ac7f98.chunk.js": "/delt-directory/static/js/488.a8ac7f98.chunk.js",
     "index.html": "/delt-directory/index.html",
     "main.e6c13ad2.css.map": "/delt-directory/static/css/main.e6c13ad2.css.map",
-    "main.9c33ce06.js.map": "/delt-directory/static/js/main.9c33ce06.js.map",
+    "main.773a0970.js.map": "/delt-directory/static/js/main.773a0970.js.map",
     "488.a8ac7f98.chunk.js.map": "/delt-directory/static/js/488.a8ac7f98.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.9c33ce06.js"
+    "static/js/main.773a0970.js"
   ]
 }
