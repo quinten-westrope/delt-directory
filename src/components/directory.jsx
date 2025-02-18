@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Typography, List, ListItem, Modal, Box, Button, IconButton } from '@mui/material';
+import { TextField, Typography, List, ListItem, Modal, Box, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import activeData from '../data/actives.json'; // Adjust the path as necessary
 import alumniData from '../data/alumni.json'; // Adjust the path as necessary
 
@@ -12,6 +13,8 @@ const Directory = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [membersList, setMembersList] = useState(''); // 'active' or 'alumni'
   const [members, setMembers] = useState([]);
+  const [searchMode, setSearchMode] = useState('name'); // 'name', 'major', or 'graduationYear'
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     if (membersList === 'active') {
@@ -19,6 +22,9 @@ const Directory = () => {
     } else if (membersList === 'alumni') {
       setMembers(alumniData);
     }
+    setSearchMode('name'); // Reset search mode to 'name' when switching sections
+    setSearch(''); // Clear the search field when switching sections
+    setResults([]); // Clear the results when switching sections
   }, [membersList]);
 
   const handleSearch = (e) => {
@@ -28,9 +34,18 @@ const Directory = () => {
     if (query === '') {
       setResults([]);
     } else {
-      const filteredResults = members.filter((member) =>
-        member.name.toLowerCase().includes(query.toLowerCase())
-      );
+      const filteredResults = members.filter((member) => {
+        if (searchMode === 'name') {
+          return member.name.toLowerCase().includes(query.toLowerCase());
+        } else if (searchMode === 'major') {
+          return member.major.toLowerCase().includes(query.toLowerCase());
+        } else if (searchMode === 'graduationYear') {
+          const year = member.graduation_year.toString().match(/\d{4}/);
+          return year && year[0].includes(query);
+        } else {
+          return member.pledge_class.toLowerCase().includes(query.toLowerCase());
+        }
+      });
       setResults(filteredResults);
     }
   };
@@ -47,6 +62,17 @@ const Directory = () => {
 
   const handleBackClick = () => {
     setShowSearch(false);
+    setSearch('');
+    setResults([]);
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = (mode) => {
+    setSearchMode(mode);
+    setAnchorEl(null);
     setSearch('');
     setResults([]);
   };
@@ -90,14 +116,40 @@ const Directory = () => {
       )}
 
       {showSearch && (
-        <TextField
-          label="Search by name"
-          value={search}
-          onChange={handleSearch}
-          variant="outlined"
-          margin="normal"
-          style={{ width: '300px', marginTop: '-22px' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '-22px' }}>
+          <TextField
+            label={`Search by ${searchMode === 'name' ? 'name' : searchMode === 'major' ? 'major' : searchMode === 'graduationYear' ? 'graduation year' : 'pledge class'}`}
+            value={search}
+            onChange={handleSearch}
+            variant="outlined"
+            margin="normal"
+            style={{ width: '300px' }}
+          />
+          <div>
+            <IconButton onClick={handleMenuClick} style={{ color: 'black', transform: 'scale(1.2)' }}>
+              <ArrowDropDownIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+            >
+              {membersList === 'active' && (
+                <>
+                  <MenuItem onClick={() => handleMenuClose('name')}>Search by Name</MenuItem>
+                  <MenuItem onClick={() => handleMenuClose('major')}>Search by Major</MenuItem>
+                  <MenuItem onClick={() => handleMenuClose('graduationYear')}>Search by Graduation Year</MenuItem>
+                </>
+              )}
+              {membersList === 'alumni' && (
+                <>
+                  <MenuItem onClick={() => handleMenuClose('name')}>Search by Name</MenuItem>
+                  <MenuItem onClick={() => handleMenuClose('pledgeClass')}>Search by Pledge Class</MenuItem>
+                </>
+              )}
+            </Menu>
+          </div>
+        </div>
       )}
 
       <List>
