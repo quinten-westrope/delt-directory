@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Typography, List, ListItem, Modal, Box, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { TextField, Typography, List, ListItem, Modal, Box, Button, IconButton, Menu, MenuItem, Paper } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import activeData from '../data/actives.json'; // Adjust the path as necessary
 import alumniData from '../data/alumni.json'; // Adjust the path as necessary
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Directory = () => {
   const [search, setSearch] = useState('');
@@ -15,6 +17,16 @@ const Directory = () => {
   const [members, setMembers] = useState([]);
   const [searchMode, setSearchMode] = useState('name'); // 'name', 'major', or 'graduationYear'
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    major: '',
+    graduationYear: ''
+  });
+
+  const isMobile = useMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
     if (membersList === 'active') {
@@ -25,6 +37,8 @@ const Directory = () => {
     setSearchMode('name'); // Reset search mode to 'name' when switching sections
     setSearch(''); // Clear the search field when switching sections
     setResults([]); // Clear the results when switching sections
+    resetUpdateForm(); // Reset the update form when switching sections
+    setShowUpdateForm(false); // Ensure the update form is closed when switching sections
   }, [membersList]);
 
   const handleSearch = (e) => {
@@ -64,6 +78,9 @@ const Directory = () => {
     setShowSearch(false);
     setSearch('');
     setResults([]);
+    setMembersList(''); // Reset membersList to hide the update button
+    resetUpdateForm(); // Reset the update form when going back
+    setShowUpdateForm(false); // Ensure the update form is closed when going back
   };
 
   const handleMenuClick = (event) => {
@@ -77,6 +94,59 @@ const Directory = () => {
     setResults([]);
   };
 
+  const handleUpdateClick = () => {
+    setShowUpdateForm(!showUpdateForm);
+    if (showUpdateForm) {
+      resetUpdateForm(); // Reset the update form when closing the dropdown
+    }
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: value
+    }));
+  };
+
+  const handleUpdateSubmit = async () => {
+    if (updateInfo.name) {
+      try {
+        const endpoint = membersList === 'active' ? 'update-info' : 'update-alumni';
+        const response = await fetch(`http://localhost:3001/${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateInfo),
+        });
+  
+        if (response.ok) {
+          console.log('Update Info:', updateInfo);
+          resetUpdateForm(); // Reset the form fields after sending
+          setShowUpdateForm(false);
+        } else {
+          alert('Failed to update information.');
+        }
+      } catch (error) {
+        console.error('Error updating information:', error);
+        alert('An error occurred while updating information.');
+      }
+    } else {
+      alert('Name is required to update information.');
+    }
+  };
+
+  const resetUpdateForm = () => {
+    setUpdateInfo({
+      name: '',
+      phone: '',
+      email: '',
+      major: '',
+      graduationYear: ''
+    });
+  };
+
   return (
     <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h5">Delt Directory</Typography>
@@ -87,6 +157,90 @@ const Directory = () => {
           style={{ maxWidth: '50%', height: 'auto', objectFit: 'contain' }} 
         />
       </div>
+
+      {membersList && (
+        isMobile ? (
+          <IconButton 
+            onClick={handleUpdateClick} 
+            style={{ position: 'absolute', top: '10px', right: '10px', color: '#3f51b5', transform: 'scale(1.3)', marginRight: '7px', marginTop: '7px' }}
+          >
+            <EditIcon />
+          </IconButton>
+        ) : (
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleUpdateClick} 
+            style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#3f51b5', color: '#fff' }}
+          >
+            Update Information
+          </Button>
+        )
+      )}
+
+      {showUpdateForm && (
+        <Paper style={{ position: 'absolute', top: isMobile ? '70px' : '52px', right: '10px', padding: '10px', zIndex: 10, width: '250px' }}>
+          <Typography variant="h6">Update Information</Typography>
+          <TextField
+            label="Full Name"
+            name="name"
+            value={updateInfo.name}
+            onChange={handleUpdateChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            required
+          />
+          <TextField
+            label="Phone"
+            name="phone"
+            value={updateInfo.phone}
+            onChange={handleUpdateChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={updateInfo.email}
+            onChange={handleUpdateChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+          />
+          {membersList === 'active' && (
+            <>
+              <TextField
+                label="Major"
+                name="major"
+                value={updateInfo.major}
+                onChange={handleUpdateChange}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+              />
+              <TextField
+                label="Graduation Year"
+                name="graduationYear"
+                value={updateInfo.graduationYear}
+                onChange={handleUpdateChange}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+              />
+            </>
+          )}
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleUpdateSubmit} 
+            style={{ marginTop: '10px', backgroundColor: '#3f51b5', color: '#fff' }}
+          >
+            Send
+          </Button>
+        </Paper>
+      )}
 
       {showSearch && (
         <IconButton onClick={handleBackClick} style={{ position: 'absolute', top: '10px', left: '10px', color: 'black' }}>
@@ -126,7 +280,7 @@ const Directory = () => {
             style={{ width: '300px' }}
           />
           <div>
-            <IconButton onClick={handleMenuClick} style={{ color: 'black', transform: 'scale(1.2)' }}>
+            <IconButton onClick={handleMenuClick} style={{ color: 'black', transform: 'scale(1.5)' }}>
               <ArrowDropDownIcon />
             </IconButton>
             <Menu
